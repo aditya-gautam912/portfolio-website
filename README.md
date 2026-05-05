@@ -5,7 +5,7 @@ A modern, responsive, and professional portfolio website built with Vanilla HTML
 ![Portfolio Preview](assets/images/profile.png)
 
 ## 🌐 Live Demo
-*(Will be updated once GitHub Pages is enabled)*
+[https://aditya-gautam912.github.io/portfolio-website/](https://aditya-gautam912.github.io/portfolio-website/)
 
 ## ✨ Features
 - **Dark/Light Mode Toggle**: User preference saved in local storage.
