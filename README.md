@@ -43,7 +43,8 @@ portfolio/
 ## 👤 Author
 **Aditya Gautam**
 - GitHub: [@aditya-gautam912](https://github.com/aditya-gautam912)
-- LinkedIn: [adityagautam](https://www.linkedin.com/in/adityagautam-769900313/)
+- LinkedIn: [adityagautam](https://www.linkedin.com/in/aditya-gautam-769900313/)
+
 
 ---
 *Created with passion by Aditya Gautam.*
