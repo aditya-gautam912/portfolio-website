@@ -1,9 +1,3 @@
-/* ============================================
-   Aditya Gautam — Premium Portfolio Script
-   Scroll-driven animations, particle system,
-   custom cursor, and interactive effects.
-   ============================================ */
-
 document.addEventListener('DOMContentLoaded', () => {
 
   // ---------- LOADING SCREEN ----------
@@ -36,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     animateFollower();
 
-    // Grow cursor on interactive elements
     const interactables = document.querySelectorAll('a, button, .project-card, .skill-bar, .contact__card, .timeline__content');
     interactables.forEach(el => {
       el.addEventListener('mouseenter', () => {
@@ -49,6 +42,70 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
+
+  // ---------- HERO MOUSE SPOTLIGHT ----------
+  const spotlight = document.querySelector('.hero__spotlight');
+  if (spotlight) {
+    document.querySelector('.hero')?.addEventListener('mousemove', (e) => {
+      const rect = spotlight.parentElement.getBoundingClientRect();
+      spotlight.style.left = e.clientX - rect.left + 'px';
+      spotlight.style.top = e.clientY - rect.top + 'px';
+    });
+  }
+
+  // ---------- TEXT SCRAMBLE EFFECT ----------
+  const heroName = document.querySelector('.hero__name');
+  if (heroName) {
+    const originalText = heroName.textContent;
+    const chars = '!@#$%^&*()_+-=[]{}|;:,.<>?/';
+    let interval = null;
+    let frame = 0;
+
+    function scramble() {
+      let output = '';
+      for (let i = 0; i < originalText.length; i++) {
+        if (i < frame) {
+          output += originalText[i];
+        } else {
+          output += chars[Math.floor(Math.random() * chars.length)];
+        }
+      }
+      heroName.textContent = output;
+      frame++;
+      if (frame > originalText.length) {
+        clearInterval(interval);
+        heroName.textContent = originalText;
+      }
+    }
+
+    const heroObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            frame = 0;
+            interval = setInterval(scramble, 50);
+          }, 800);
+          heroObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    heroObserver.observe(heroName);
+  }
+
+  // ---------- MAGNETIC BUTTON ----------
+  document.querySelectorAll('.btn--primary, .btn--ghost').forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = '';
+    });
+  });
 
   // ---------- SCROLL PROGRESS ----------
   const progressBar = document.getElementById('scroll-progress');
@@ -69,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentScroll = window.scrollY;
     header?.classList.toggle('scrolled', currentScroll > 50);
 
-    // Scroll top button
     const scrollTop = document.getElementById('scroll-top');
     if (scrollTop) {
       scrollTop.classList.toggle('show', currentScroll > 500);
@@ -90,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
     navClose.addEventListener('click', () => navList.classList.remove('show'));
   }
 
-  // Close menu on link click
   document.querySelectorAll('.nav__link').forEach(link => {
     link.addEventListener('click', () => navList?.classList.remove('show'));
   });
@@ -100,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const STORAGE_KEY = 'ag-portfolio-theme';
 
   const getTheme = () => document.body.classList.contains('light-theme') ? 'light' : 'dark';
-  const getIcon = () => themeBtn?.classList.contains('fa-sun') ? 'fa-moon' : 'fa-sun';
 
   const savedTheme = localStorage.getItem(STORAGE_KEY);
   if (savedTheme === 'light') {
@@ -159,6 +213,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   revealElements.forEach(el => revealObserver.observe(el));
 
+  // ---------- SECTION DIVIDER REVEAL ----------
+  const sectionsAll = document.querySelectorAll('.section');
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+
+  sectionsAll.forEach(el => sectionObserver.observe(el));
+
   // ---------- SKILL BAR ANIMATION ----------
   const skillBars = document.querySelectorAll('.skill-bar');
 
@@ -171,7 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (fill) {
           const pct = bar.dataset.percent || 0;
           fill.style.setProperty('--target', pct + '%');
-          // Set width after a tiny delay to trigger CSS transition
           setTimeout(() => { fill.style.width = pct + '%'; }, 100);
         }
         skillObserver.unobserve(bar);
@@ -222,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let w, h;
     const particles = [];
     const PARTICLE_COUNT = 60;
-    const hue = 230; // Match CSS var(--hue)
+    const hue = 230;
 
     function resize() {
       const hero = canvas.parentElement;
@@ -249,7 +314,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function draw() {
       ctx.clearRect(0, 0, w, h);
 
-      // Draw connections
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
@@ -267,7 +331,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Draw particles
       particles.forEach(p => {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
@@ -285,13 +348,11 @@ document.addEventListener('DOMContentLoaded', () => {
         p.y += p.vy;
         p.opacity += (p.baseOpacity - p.opacity) * 0.02;
 
-        // Wrap around edges
         if (p.x < -20) p.x = w + 20;
         if (p.x > w + 20) p.x = -20;
         if (p.y < -20) p.y = h + 20;
         if (p.y > h + 20) p.y = -20;
 
-        // Gentle oscillation
         p.vx += (Math.random() - 0.5) * 0.02;
         p.vy += (Math.random() - 0.5) * 0.02;
         p.vx = Math.max(-1, Math.min(1, p.vx));
@@ -308,7 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
       createParticles();
     });
 
-    // Mouse parallax influence
     canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
       const mx = (e.clientX - rect.left) / w;
@@ -355,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ---------- CONTACT FORM (basic) ----------
+  // ---------- CONTACT FORM ----------
   const contactForm = document.getElementById('contact-form');
   contactForm?.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -364,7 +424,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.innerHTML = '<span>Sending...</span><i class="fa-solid fa-spinner fa-spin"></i>';
     btn.disabled = true;
 
-    // Simulate sending
     setTimeout(() => {
       btn.innerHTML = '<span>Message Sent!</span><i class="fa-solid fa-check"></i>';
       setTimeout(() => {
@@ -375,7 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1500);
   });
 
-  // ---------- PARALLAX EFFECT ON HERO SCROLL ----------
+  // ---------- PARALLAX ON HERO SCROLL ----------
   window.addEventListener('scroll', () => {
     const scrolled = window.scrollY;
     const hero = document.querySelector('.hero__content');
@@ -390,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ---------- GLARE EFFECT ON ABOUT IMAGE ----------
+  // ---------- GLARE ON ABOUT IMAGE ----------
   const aboutImg = document.querySelector('.about__img-wrapper');
   aboutImg?.addEventListener('mousemove', (e) => {
     const rect = aboutImg.getBoundingClientRect();
@@ -403,6 +462,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  console.log('%c Aditya Gautam Portfolio ', 'background: #6c63ff; color: #fff; padding: 8px 16px; font-size: 14px; border-radius: 4px; font-weight: bold;');
-  console.log('%c Built with passion, one line at a time. ', 'color: #aaa; font-size: 12px;');
+  // ---------- PARALLAX FLOATING ORBS ----------
+  document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 2;
+    const y = (e.clientY / window.innerHeight - 0.5) * 2;
+
+    document.querySelectorAll('.orb').forEach((orb, i) => {
+      const speed = 10 + i * 5;
+      orb.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+    });
+  });
+
+  console.log('%c Aditya Gautam Portfolio ', 'background: linear-gradient(135deg, #6c63ff, #fbbf24); color: #fff; padding: 8px 16px; font-size: 14px; border-radius: 4px; font-weight: bold;');
+  console.log('%c Crafted with precision and passion. ', 'color: #aaa; font-size: 12px;');
 });
